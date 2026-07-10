@@ -1,0 +1,13 @@
+{
+  "name": "@carnet/core",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "peerDependencies": {
+    "react-native": "*"
+  },
+  "dependencies": {
+    "firebase": "^10.14.1"
+  }
+}

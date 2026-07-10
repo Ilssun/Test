@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@carnet/core": ["../../packages/core/src"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}

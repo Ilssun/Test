@@ -1,0 +1,18 @@
+{
+  "name": "carnet-comptable",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/core",
+    "apps/mobile",
+    "apps/desktop"
+  ],
+  "scripts": {
+    "mobile": "npm run start --workspace=apps/mobile",
+    "mobile:android": "npm run android --workspace=apps/mobile",
+    "mobile:ios": "npm run ios --workspace=apps/mobile",
+    "web:export": "npm run export:web --workspace=apps/mobile",
+    "desktop": "npm run start --workspace=apps/desktop",
+    "desktop:build": "npm run build --workspace=apps/desktop"
+  }
+}

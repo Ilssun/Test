@@ -1,0 +1,18 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Receipts are readable by any signed-in member (matches the original
+    // app's "PDFs downloadable by everyone" behaviour) and writable by
+    // whoever is logged in — deletion happens through the transactions
+    // Firestore rule, which already restricts who can delete a transaction.
+    match /receipts/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.resource.size < 3 * 1024 * 1024;
+      allow delete: if isSignedIn();
+    }
+  }
+}

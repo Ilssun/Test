@@ -1,0 +1,131 @@
+# Carnet Comptable
+
+Application de comptabilité multiplateforme (Windows, Android, iOS, Web) —
+adaptée à partir d'un carnet d'entraînement sportif : mêmes idées
+(comptes, membres, groupes, admin qui valide les inscriptions, historique
+filtrable) mais appliquées à des écritures comptables (revenus / dépenses)
+au lieu de séances de sport.
+
+## Fonctionnalités
+
+- **Comptes utilisateurs** : inscription par nom d'utilisateur, validation
+  par un admin avant la première connexion, changement de mot de passe.
+- **Groupes** : pour séparer les écritures visibles dans l'historique
+  (ex : famille, association, entreprise), un membre appartient à un groupe.
+- **Catégories** (Revenu / Dépense), gérées par les admins, import en masse.
+- **Comptes bancaires** (Compte courant, Espèces, Carte...), gérés par les admins.
+- **Écritures** : date, catégorie, compte, montant, note, justificatif
+  (photo ou PDF, 3 Mo max).
+- **Historique** : totaux (revenus / dépenses / solde), répartition par
+  catégorie, filtres par groupe / membre / catégorie.
+- **Admin** : gestion du catalogue de catégories et de comptes.
+- **Membres** : validation des inscriptions, gestion des groupes,
+  promotion admin, réinitialisation de mot de passe, suppression de compte.
+
+## Architecture
+
+Un seul code source React (Expo / React Native) couvre **Android, iOS et
+Web** ; l'app Web est ensuite empaquetée avec **Electron** pour produire un
+exécutable **Windows**.
+
+```
+packages/core     logique métier partagée (Firebase, types, services)
+apps/mobile       app Expo (React Native) — Android, iOS, Web
+apps/desktop      coquille Electron qui charge l'export Web pour Windows
+functions         2 Cloud Functions admin (reset mot de passe / suppression de compte)
+firebase/         règles de sécurité Firestore + Storage
+```
+
+Les données sont stockées sur **Firebase** (Firestore + Auth + Storage) et
+se synchronisent automatiquement entre tous tes appareils.
+
+## 1. Créer le projet Firebase
+
+1. Va sur https://console.firebase.google.com et crée un projet.
+2. Active **Authentication** → méthode **Email/Password**.
+3. Active **Firestore Database** (mode production).
+4. Active **Storage**.
+5. Dans *Paramètres du projet → Général*, ajoute une app **Web**, puis
+   copie les valeurs `apiKey`, `authDomain`, `projectId`,
+   `storageBucket`, `messagingSenderId`, `appId`.
+6. Passe le projet en forfait **Blaze** (pay-as-you-go) — nécessaire pour
+   déployer les Cloud Functions (le volume de cette app reste dans les
+   quotas gratuits pour un usage familial/petite structure, mais Firebase
+   exige Blaze pour activer les Functions).
+
+## 2. Configurer le code
+
+```bash
+npm install
+cp apps/mobile/.env.example apps/mobile/.env
+# remplis apps/mobile/.env avec les valeurs Firebase récupérées ci-dessus
+```
+
+Déployer les règles de sécurité et les Cloud Functions :
+
+```bash
+npm install -g firebase-tools
+firebase login
+cp firebase/.firebaserc.example firebase/.firebaserc
+# édite firebase/.firebaserc avec l'ID de ton projet Firebase
+cd firebase && firebase deploy --only firestore:rules,storage:rules,functions
+```
+
+## 3. Premier lancement — créer le premier admin
+
+Par sécurité, l'inscription ne crée **jamais** de compte admin directement
+(les règles Firestore l'interdisent). Après ta première inscription dans
+l'app :
+
+1. Ouvre la console Firebase → Firestore → collection `users`.
+2. Trouve ton document (par ton `username`).
+3. Modifie les champs : `role` → `"admin"`, `status` → `"active"`.
+
+Tu peux ensuite te connecter et valider les inscriptions suivantes depuis
+l'onglet **Membres** de l'app.
+
+## 4. Lancer en développement
+
+```bash
+npm run mobile        # ouvre Expo Dev Tools (scanne le QR code avec Expo Go)
+npm run mobile:android
+npm run mobile:ios
+```
+
+## 5. Publier sur Android / iOS (via EAS Build)
+
+Nécessite un compte Expo (gratuit) et, pour iOS, un compte Apple Developer
+(99 $/an) ; pour Android, un compte Google Play Console (25 $ une fois).
+
+```bash
+npm install -g eas-cli
+cd apps/mobile
+eas login
+eas build:configure
+eas build --platform android
+eas build --platform ios
+eas submit --platform android
+eas submit --platform ios
+```
+
+## 6. Construire l'app Windows (Electron)
+
+```bash
+npm run web:export                # génère apps/mobile/dist (export web Expo)
+rm -rf apps/desktop/web && cp -r apps/mobile/dist apps/desktop/web
+cd apps/desktop
+npm install
+npm run build                     # produit l'installeur .exe dans apps/desktop/release
+```
+
+Remplace `apps/desktop/icon.ico` par une vraie icône avant de distribuer
+l'installeur (aucune icône par défaut n'est fournie).
+
+## Ce que ce dépôt ne fait PAS
+
+- Il ne construit pas de binaires signés `.apk` / `.ipa` / `.exe` prêts à
+  publier — cela nécessite tes propres comptes développeur (Apple, Google,
+  éventuellement un certificat de signature Windows) et s'exécute via les
+  commandes `eas build` / `electron-builder` ci-dessus.
+- Il ne fournit pas d'icônes ni de splash screen définitifs — remplace les
+  fichiers dans `apps/mobile/assets/` et `apps/desktop/icon.ico`.

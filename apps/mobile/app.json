@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Carnet Comptable",
+    "slug": "carnet-comptable",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "carnetcomptable",
+    "splash": {
+      "backgroundColor": "#F1EEE3"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.carnetcomptable.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F1EEE3"
+      },
+      "package": "com.carnetcomptable.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": ["expo-document-picker", "expo-image-picker"]
+  }
+}
