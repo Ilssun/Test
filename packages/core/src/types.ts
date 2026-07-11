@@ -19,11 +19,22 @@ export interface Group {
   createdAt: number;
 }
 
+// Groups categories in the catalog (e.g. "Revenus", "Dépenses fixes") — purely
+// organizational, distinct from `Group` (member teams like "Équipe du mardi").
+export interface CategoryGroup {
+  id: string;
+  name: string;
+  createdAt: number;
+}
+
 export interface Category {
   id: string;
   name: string;
   type: CategoryType;
   desc: string;
+  details: string; // optional long-form notes shown when picked (e.g. instructions, context)
+  document?: Receipt | null; // optional attached reference document (contract, invoice template...)
+  groupId: string; // "" = ungrouped, else a CategoryGroup id
   createdAt: number;
 }
 

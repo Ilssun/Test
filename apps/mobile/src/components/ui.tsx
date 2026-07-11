@@ -86,6 +86,47 @@ export const Chip = ({ label, tone = "blue" }: { label: string; tone?: "blue" | 
   </View>
 );
 
+const TallyGroup = ({ n }: { n: number }) => {
+  const bars = Math.min(n, 4);
+  return (
+    <View style={{ flexDirection: "row", alignItems: "flex-end", width: 22, height: 16 }}>
+      {Array.from({ length: bars }).map((_, i) => (
+        <View key={i} style={{ width: 2, height: 14, backgroundColor: colors.blue, marginRight: 2, borderRadius: 1 }} />
+      ))}
+      {n >= 5 && (
+        <View
+          style={{
+            position: "absolute",
+            width: 24,
+            height: 2,
+            backgroundColor: colors.blue,
+            top: 6,
+            left: -1,
+            transform: [{ rotate: "-35deg" }],
+          }}
+        />
+      )}
+    </View>
+  );
+};
+
+export const Tally = ({ count }: { count: number }) => {
+  const groups = Math.floor(count / 5);
+  const rest = count % 5;
+  const maxGroups = 6;
+  const shown = Math.min(groups, maxGroups);
+  const overflow = groups > maxGroups;
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 4 }}>
+      {Array.from({ length: shown }).map((_, i) => (
+        <TallyGroup key={i} n={5} />
+      ))}
+      {!overflow && rest > 0 && <TallyGroup n={rest} />}
+      {overflow && <Text style={{ fontSize: 11, color: colors.muted }}>+{count - maxGroups * 5}</Text>}
+    </View>
+  );
+};
+
 export const Pill = ({
   label,
   sub,

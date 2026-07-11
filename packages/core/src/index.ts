@@ -3,6 +3,7 @@ export * from "./utils";
 export * from "./firebase";
 export * from "./auth";
 export * from "./groups";
+export * from "./categoryGroups";
 export * from "./categories";
 export * from "./accounts";
 export * from "./transactions";

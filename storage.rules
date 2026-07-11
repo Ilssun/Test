@@ -14,5 +14,13 @@ service firebase.storage {
       allow write: if isSignedIn() && request.resource.size < 3 * 1024 * 1024;
       allow delete: if isSignedIn();
     }
+
+    // Reference documents attached to catalog categories (admin-managed),
+    // mirrors the original app's per-session PDF attachments.
+    match /category-docs/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.resource.size < 3 * 1024 * 1024;
+      allow delete: if isSignedIn();
+    }
   }
 }

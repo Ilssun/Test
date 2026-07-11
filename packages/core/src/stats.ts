@@ -43,6 +43,25 @@ export const byAccount = (list: Transaction[]) => {
   return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
 };
 
+// Ranks members by number of écritures logged — mirrors the original app's
+// leaderboard of who validated the most séances.
+export const leaderboard = (list: Transaction[]) => {
+  const map = new Map<string, { name: string; count: number }>();
+  for (const t of list) {
+    const cur = map.get(t.userId) || { name: t.userName, count: 0 };
+    cur.count += 1;
+    map.set(t.userId, cur);
+  }
+  return [...map.values()].filter((x) => x.count > 0).sort((a, b) => b.count - a.count);
+};
+
+export const favoriteCategory = (list: Transaction[]) => {
+  const counts = new Map<string, number>();
+  for (const t of list) counts.set(t.categoryName, (counts.get(t.categoryName) || 0) + 1);
+  const best = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+  return best ? best[0] : "—";
+};
+
 export const groupByDate = (list: Transaction[]) => {
   const map = new Map<string, Transaction[]>();
   for (const t of list) {

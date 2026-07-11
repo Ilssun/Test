@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { fmtDate, fmtAmount, visibleTransactions, totals, byCategory, groupByDate } from "@carnet/core";
-import { Eyebrow, Avatar, Chip } from "../components/ui";
+import { fmtDate, fmtAmount, visibleTransactions, totals, byCategory, groupByDate, leaderboard, favoriteCategory } from "@carnet/core";
+import { Eyebrow, Avatar, Chip, Tally } from "../components/ui";
 import { colors } from "../theme";
 import { useAuth } from "../context/AuthContext";
 import { useData } from "../context/DataContext";
@@ -33,6 +33,8 @@ export default function HistoryScreen() {
   const stats = useMemo(() => totals(filtered), [filtered]);
   const cats = useMemo(() => byCategory(filtered), [filtered]);
   const grouped = useMemo(() => groupByDate(filtered), [filtered]);
+  const board = useMemo(() => leaderboard(filtered), [filtered]);
+  const favCategory = useMemo(() => favoriteCategory(filtered), [filtered]);
 
   const memberNames = useMemo(() => {
     const map = new Map<string, string>();
@@ -51,6 +53,28 @@ export default function HistoryScreen() {
         <StatBox label="Dépenses" value={fmtAmount(stats.expense)} tone={colors.red} />
         <StatBox label="Solde" value={fmtAmount(stats.balance)} tone={stats.balance >= 0 ? colors.income : colors.red} />
       </View>
+
+      <View style={[styles.statsRow, { marginTop: 8 }]}>
+        <StatBox label="Écritures" value={String(filtered.length)} tone={colors.text} />
+        <StatBox label="Membres actifs" value={String(board.length)} tone={colors.text} />
+        <StatBox label="Catégorie favorite" value={favCategory} tone={colors.text} small />
+      </View>
+
+      {board.length > 0 && (
+        <View style={{ marginTop: 24 }}>
+          <Eyebrow>Le décompte</Eyebrow>
+          {board.map((u, i) => (
+            <View key={u.name} style={styles.boardRow}>
+              <Text style={styles.boardRank}>{i === 0 ? "🏆" : i + 1}</Text>
+              <Text style={styles.boardName}>{u.name}</Text>
+              <View style={{ flex: 1 }}>
+                <Tally count={u.count} />
+              </View>
+              <Text style={styles.boardCount}>{u.count}</Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       {cats.length > 0 && (
         <View style={{ marginTop: 24 }}>
@@ -145,9 +169,11 @@ export default function HistoryScreen() {
   );
 }
 
-const StatBox = ({ label, value, tone }: { label: string; value: string; tone: string }) => (
+const StatBox = ({ label, value, tone, small }: { label: string; value: string; tone: string; small?: boolean }) => (
   <View style={styles.statBox}>
-    <Text style={[styles.statValue, { color: tone }]}>{value}</Text>
+    <Text style={[styles.statValue, { color: tone }, small && { fontSize: 13 }]} numberOfLines={2}>
+      {value}
+    </Text>
     <Text style={styles.statLabel}>{label}</Text>
   </View>
 );
@@ -162,6 +188,10 @@ const styles = StyleSheet.create({
   barTrack: { flex: 1, height: 8, backgroundColor: colors.line, borderRadius: 4, overflow: "hidden" },
   barFill: { height: 8, borderRadius: 4 },
   catAmount: { fontSize: 12.5, fontWeight: "700", width: 80, textAlign: "right" },
+  boardRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.line },
+  boardRank: { width: 22, textAlign: "center", fontSize: 13, color: colors.muted },
+  boardName: { fontWeight: "700", fontSize: 14.5, color: colors.text, minWidth: 80 },
+  boardCount: { fontSize: 13, fontWeight: "700", color: colors.blue },
   pickerWrap: { borderWidth: 2, borderColor: colors.blue, borderRadius: 8, backgroundColor: colors.field },
   stamp: {
     alignSelf: "flex-start",
