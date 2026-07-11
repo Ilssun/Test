@@ -33,7 +33,7 @@ packages/core     logique métier partagée (Firebase, types, services)
 apps/mobile       app Expo (React Native) — Android, iOS, Web
 apps/desktop      coquille Electron qui charge l'export Web pour Windows
 functions         2 Cloud Functions admin (reset mot de passe / suppression de compte)
-firebase/         règles de sécurité Firestore + Storage
+firebase.json, firestore.rules, storage.rules   règles de sécurité Firestore + Storage
 ```
 
 Les données sont stockées sur **Firebase** (Firestore + Auth + Storage) et
@@ -66,9 +66,9 @@ Déployer les règles de sécurité et les Cloud Functions :
 ```bash
 npm install -g firebase-tools
 firebase login
-cp firebase/.firebaserc.example firebase/.firebaserc
-# édite firebase/.firebaserc avec l'ID de ton projet Firebase
-cd firebase && firebase deploy --only firestore:rules,storage:rules,functions
+cp .firebaserc.example .firebaserc
+# édite .firebaserc avec l'ID de ton projet Firebase
+firebase deploy --only firestore:rules,storage,functions
 ```
 
 ## 3. Premier lancement — créer le premier admin

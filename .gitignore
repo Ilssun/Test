@@ -6,6 +6,7 @@ web-build/
 apps/mobile/dist/
 apps/desktop/dist/
 apps/desktop/release/
+functions/lib/
 *.log
 .DS_Store
 .env
