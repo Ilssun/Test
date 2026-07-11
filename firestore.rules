@@ -20,12 +20,14 @@ service cloud.firestore {
       return isActive() && me().role == 'admin';
     }
 
-    // Users can always read the full member list (needed for history/leaderboard
-    // filtering by group) but may only create their own profile at signup and
-    // only edit a restricted set of their own fields afterwards. Anything else
-    // (approving, promoting, deleting other accounts) is admin-only.
+    // Reading the member list must be public (not just isSignedIn()): looking
+    // up a username's synthetic email happens BEFORE authentication, both at
+    // signup (duplicate-name check) and at login (username -> email lookup).
+    // No sensitive data lives on these docs (no password hashes — Firebase
+    // Auth owns that), so this is safe. Only creating/editing/deleting a
+    // profile requires being signed in.
     match /users/{userId} {
-      allow read: if isSignedIn();
+      allow read: if true;
 
       // Self-signup can only ever create a pending, non-admin profile.
       // The first account of a fresh deployment must be promoted to
@@ -44,8 +46,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Also public: the signup screen lists groups in a dropdown before login.
     match /groups/{groupId} {
-      allow read: if isSignedIn();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
