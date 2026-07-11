@@ -1,24 +1,25 @@
-# Carnet Comptable
+# Carnet d'entraînement
 
-Application de comptabilité multiplateforme (Windows, Android, iOS, Web) —
-adaptée à partir d'un carnet d'entraînement sportif : mêmes idées
-(comptes, membres, groupes, admin qui valide les inscriptions, historique
-filtrable) mais appliquées à des écritures comptables (revenus / dépenses)
-au lieu de séances de sport.
+Application de suivi d'entraînement sportif multiplateforme (Windows,
+Android, iOS, Web) pour un club ou une équipe : catalogue de séances,
+validation quotidienne, historique et classement partagés entre membres.
 
 ## Fonctionnalités
 
 - **Comptes utilisateurs** : inscription par nom d'utilisateur, validation
   par un admin avant la première connexion, changement de mot de passe.
-- **Groupes** : pour séparer les écritures visibles dans l'historique
-  (ex : famille, association, entreprise), un membre appartient à un groupe.
-- **Catégories** (Revenu / Dépense), gérées par les admins, import en masse.
-- **Comptes bancaires** (Compte courant, Espèces, Carte...), gérés par les admins.
-- **Écritures** : date, catégorie, compte, montant, note, justificatif
-  (photo ou PDF, 3 Mo max).
-- **Historique** : totaux (revenus / dépenses / solde), répartition par
-  catégorie, filtres par groupe / membre / catégorie.
-- **Admin** : gestion du catalogue de catégories et de comptes.
+- **Groupes** : pour séparer l'historique visible entre équipes (ex :
+  "Équipe du mardi"), un membre appartient à un groupe.
+- **Catégories** (ex : Cardio, Renfo), gérées par les admins, pour organiser
+  le catalogue de séances en sous-menus.
+- **Catalogue de séances** : nom, description, détail des exercices,
+  document attaché (PDF/photo, 3 Mo max), import en masse.
+- **Ma séance** : validation quotidienne (date, séance, note en étoiles
+  optionnelle, commentaire).
+- **Historique** : total de séances validées, athlètes actifs, séance
+  favorite, classement (traits de comptage), filtres par groupe / membre /
+  séance.
+- **Admin** : gestion du catalogue de séances et des catégories.
 - **Membres** : validation des inscriptions, gestion des groupes,
   promotion admin, réinitialisation de mot de passe, suppression de compte.
 

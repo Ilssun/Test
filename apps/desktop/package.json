@@ -12,8 +12,8 @@
     "electron-builder": "^25.0.5"
   },
   "build": {
-    "appId": "com.carnetcomptable.app",
-    "productName": "Carnet Comptable",
+    "appId": "com.carnetentrainement.app",
+    "productName": "Carnet d'entraînement",
     "files": ["main.js", "preload.js", "web/**/*"],
     "directories": { "output": "release" },
     "win": {

@@ -1,25 +1,25 @@
 {
   "expo": {
-    "name": "Carnet Comptable",
-    "slug": "carnet-comptable",
+    "name": "Carnet d'entraînement",
+    "slug": "carnet-entrainement",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "carnetcomptable",
+    "scheme": "carnetentrainement",
     "splash": {
       "backgroundColor": "#F1EEE3"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.carnetcomptable.app"
+      "bundleIdentifier": "com.carnetentrainement.app"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#F1EEE3"
       },
-      "package": "com.carnetcomptable.app"
+      "package": "com.carnetentrainement.app"
     },
     "web": {
       "bundler": "metro",

@@ -2,7 +2,7 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from "react-native";
-import TransactionScreen from "../screens/TransactionScreen";
+import LogScreen from "../screens/LogScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import MembersScreen from "../screens/MembersScreen";
 import AdminScreen from "../screens/AdminScreen";
@@ -30,9 +30,9 @@ export default function RootNavigator() {
         }}
       >
         <Tab.Screen
-          name="Écriture"
-          component={TransactionScreen}
-          options={{ title: "Ma transaction", tabBarIcon: tabIcon("💶") }}
+          name="Ma séance"
+          component={LogScreen}
+          options={{ tabBarIcon: tabIcon("🏋️") }}
         />
         <Tab.Screen
           name="Historique"

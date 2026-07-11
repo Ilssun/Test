@@ -1,9 +1,12 @@
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, TextInputProps, ViewStyle } from "react-native";
-import { colors, radii } from "../theme";
+import { colors, radii, fonts } from "../theme";
 
 export const Eyebrow = ({ children }: { children: React.ReactNode }) => (
-  <Text style={styles.eyebrow}>{children}</Text>
+  <View style={styles.eyebrowRow}>
+    <Text style={styles.eyebrow}>{children}</Text>
+    <View style={styles.eyebrowLine} />
+  </View>
 );
 
 export const Section = ({ children, style }: { children: React.ReactNode; style?: ViewStyle }) => (
@@ -66,23 +69,19 @@ export const Avatar = ({ name }: { name: string }) => {
   );
 };
 
-export const Chip = ({ label, tone = "blue" }: { label: string; tone?: "blue" | "income" | "expense" }) => (
-  <View
-    style={[
-      styles.chip,
-      tone === "income" && { borderColor: "#1E8A5B" },
-      tone === "expense" && { borderColor: colors.red },
-    ]}
-  >
-    <Text
-      style={[
-        styles.chipText,
-        tone === "income" && { color: "#1E8A5B" },
-        tone === "expense" && { color: colors.red },
-      ]}
-    >
-      {label}
-    </Text>
+export const Chip = ({ label }: { label: string }) => (
+  <View style={styles.chip}>
+    <Text style={styles.chipText}>{label}</Text>
+  </View>
+);
+
+export const Stars = ({ r }: { r: number }) => (
+  <Text style={styles.stars}>{"★".repeat(r)}{"☆".repeat(Math.max(0, 5 - r))}</Text>
+);
+
+export const DateStamp = ({ children, tilt = -2 }: { children: React.ReactNode; tilt?: number }) => (
+  <View style={[styles.stamp, { transform: [{ rotate: `${tilt}deg` }] }]}>
+    <Text style={styles.stampText}>{children}</Text>
   </View>
 );
 
@@ -145,13 +144,19 @@ export const Pill = ({
 );
 
 const styles = StyleSheet.create({
+  eyebrowRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 },
   eyebrow: {
+    fontFamily: fonts.mono,
     fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.4,
+    letterSpacing: 2,
     textTransform: "uppercase",
     color: colors.blue,
-    marginBottom: 10,
+  },
+  eyebrowLine: {
+    flex: 1,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+    borderStyle: "dashed",
   },
   input: {
     width: "100%",
@@ -161,6 +166,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.sm,
     paddingVertical: 10,
     paddingHorizontal: 12,
+    fontFamily: fonts.body,
     fontSize: 15,
     color: colors.text,
   },
@@ -173,7 +179,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  btnText: { fontWeight: "700", fontSize: 16, textTransform: "uppercase", letterSpacing: 0.5 },
+  btnText: { fontFamily: fonts.displayBold, fontWeight: "700", fontSize: 17, textTransform: "uppercase", letterSpacing: 0.5 },
   btnRed: { backgroundColor: colors.red, borderWidth: 2, borderColor: colors.red },
   btnInk: { backgroundColor: "transparent", borderWidth: 2, borderColor: colors.blue },
   btnDanger: { backgroundColor: "transparent", borderWidth: 2, borderColor: colors.red },
@@ -187,7 +193,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.field,
   },
-  avatarText: { fontSize: 11, fontWeight: "700", color: colors.blue },
+  avatarText: { fontFamily: fonts.mono, fontSize: 11, color: colors.blue },
   chip: {
     borderWidth: 1.5,
     borderColor: colors.line,
@@ -195,8 +201,20 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: 10,
     alignSelf: "flex-start",
+    backgroundColor: colors.field,
   },
-  chipText: { fontSize: 12.5, fontWeight: "600", color: colors.blue },
+  chipText: { fontFamily: fonts.bodySemi, fontSize: 12.5, color: colors.blue },
+  stars: { fontFamily: fonts.mono, color: colors.blue, fontSize: 13, letterSpacing: 1 },
+  stamp: {
+    alignSelf: "flex-start",
+    borderWidth: 2,
+    borderColor: colors.red,
+    borderRadius: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 10,
+    backgroundColor: colors.sheet,
+  },
+  stampText: { fontFamily: fonts.monoSemi, color: colors.red, fontSize: 12, letterSpacing: 1 },
   pill: {
     borderWidth: 2,
     borderColor: colors.blue,
@@ -206,6 +224,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   pillOn: { backgroundColor: colors.blue },
-  pillTitle: { fontWeight: "700", fontSize: 16, color: colors.text },
-  pillSub: { fontSize: 13, color: colors.muted, marginTop: 2 },
+  pillTitle: { fontFamily: fonts.display, fontSize: 17, color: colors.text, textTransform: "uppercase" },
+  pillSub: { fontFamily: fonts.body, fontSize: 13, color: colors.muted, marginTop: 2 },
 });

@@ -7,7 +7,16 @@ export const colors = {
   text: "#1D2138",
   muted: "#70748A",
   line: "rgba(37, 71, 208, 0.22)",
-  income: "#1E8A5B",
+};
+
+export const fonts = {
+  display: "BigShouldersDisplay_800ExtraBold",
+  displayBold: "BigShouldersDisplay_700Bold",
+  mono: "IBMPlexMono_500Medium",
+  monoSemi: "IBMPlexMono_600SemiBold",
+  body: "Archivo_500Medium",
+  bodySemi: "Archivo_600SemiBold",
+  bodyBold: "Archivo_700Bold",
 };
 
 export const spacing = (n: number) => n * 4;

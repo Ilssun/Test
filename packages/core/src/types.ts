@@ -1,6 +1,5 @@
 export type Role = "admin" | "member";
 export type Status = "pending" | "active";
-export type CategoryType = "income" | "expense";
 
 export interface AppUser {
   id: string;
@@ -19,49 +18,37 @@ export interface Group {
   createdAt: number;
 }
 
-// Groups categories in the catalog (e.g. "Revenus", "Dépenses fixes") — purely
-// organizational, distinct from `Group` (member teams like "Équipe du mardi").
-export interface CategoryGroup {
-  id: string;
-  name: string;
-  createdAt: number;
-}
-
+// Groups sessions in the catalog (e.g. "Cardio", "Renfo").
 export interface Category {
   id: string;
   name: string;
-  type: CategoryType;
-  desc: string;
-  details: string; // optional long-form notes shown when picked (e.g. instructions, context)
-  document?: Receipt | null; // optional attached reference document (contract, invoice template...)
-  groupId: string; // "" = ungrouped, else a CategoryGroup id
   createdAt: number;
 }
 
-export interface Account {
-  id: string;
-  name: string;
-  desc: string;
-  createdAt: number;
-}
-
-export interface Receipt {
+export interface Document {
   name: string;
   path: string; // Firebase Storage path
   url: string; // download URL
 }
 
-export interface Transaction {
+// A catalog entry a member picks when logging a séance.
+export interface Session {
+  id: string;
+  name: string;
+  desc: string;
+  details: string;
+  document?: Document | null;
+  catId: string; // "" = uncategorized, else a Category id
+  createdAt: number;
+}
+
+export interface LogEntry {
   id: string;
   date: string; // YYYY-MM-DD
-  type: CategoryType;
-  categoryId: string;
-  categoryName: string;
-  accountId: string;
-  accountName: string;
-  amount: number; // always positive, sign derived from `type`
-  note: string;
-  receipt?: Receipt | null;
+  sessionId: string;
+  sessionName: string;
+  rating?: number; // 1-5, optional
+  comment?: string;
   userId: string;
   userName: string;
   groupId: string;

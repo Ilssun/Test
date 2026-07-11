@@ -150,7 +150,7 @@ export default function MembersScreen() {
             <View style={styles.row}>
               <Avatar name={u.username} />
               <Text style={styles.name}>{u.username}</Text>
-              {u.role === "admin" ? <Chip label="Admin" tone="expense" /> : null}
+              {u.role === "admin" ? <Chip label="Admin" /> : null}
               <View style={{ flex: 1 }} />
             </View>
             <View style={[styles.pickerWrap, { marginTop: 6 }]}>

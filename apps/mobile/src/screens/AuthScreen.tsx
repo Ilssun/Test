@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Switch } from "react-native";
 import { login, signup, listGroups, AuthError, Group } from "@carnet/core";
 import { Input, Button, Eyebrow } from "../components/ui";
-import { colors } from "../theme";
+import { colors, fonts } from "../theme";
 import { useToast } from "../context/ToastContext";
 import { Picker } from "@react-native-picker/picker";
 
@@ -45,12 +45,12 @@ export default function AuthScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Carnet{"\n"}Comptable</Text>
+      <Text style={styles.title}>Carnet{"\n"}d'entraînement</Text>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{mode === "login" ? "Connexion" : "Créer un compte"}</Text>
         <Text style={styles.cardSub}>
           {mode === "login"
-            ? "Réservé aux membres du carnet."
+            ? "Le carnet est réservé aux membres du club."
             : "Ton compte devra être validé par un admin avant ta première connexion."}
         </Text>
         {info ? <Text style={styles.info}>{info}</Text> : null}
@@ -93,8 +93,8 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   container: { flexGrow: 1, backgroundColor: colors.paper, padding: 20, justifyContent: "center" },
   title: {
+    fontFamily: fonts.display,
     fontSize: 44,
-    fontWeight: "800",
     color: colors.text,
     textTransform: "uppercase",
     lineHeight: 46,
@@ -102,9 +102,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   card: { backgroundColor: colors.sheet, borderWidth: 2, borderColor: colors.blue, borderRadius: 12, padding: 20 },
-  cardTitle: { fontSize: 22, fontWeight: "700", color: colors.text, textAlign: "center" },
-  cardSub: { fontSize: 13.5, color: colors.muted, textAlign: "center", marginTop: 4 },
+  cardTitle: { fontFamily: fonts.displayBold, fontSize: 24, color: colors.text, textAlign: "center", textTransform: "uppercase" },
+  cardSub: { fontFamily: fonts.body, fontSize: 13.5, color: colors.muted, textAlign: "center", marginTop: 4 },
   info: {
+    fontFamily: fonts.mono,
     fontSize: 12,
     color: colors.red,
     borderWidth: 2,

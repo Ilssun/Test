@@ -1,4 +1,4 @@
-# Carnet Comptable — Desktop (Windows)
+# Carnet d'entraînement — Desktop (Windows)
 
 This Electron shell packages the Expo web export as a native Windows app.
 

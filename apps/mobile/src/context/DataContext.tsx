@@ -1,33 +1,29 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import {
   Category,
-  CategoryGroup,
-  Account,
+  Session,
   Group,
-  Transaction,
+  LogEntry,
   AppUser,
   listCategories,
-  listCategoryGroups,
-  listAccounts,
+  listSessions,
   listGroups,
-  listTransactions,
+  listLogEntries,
   getAllUsers,
 } from "@carnet/core";
 import { useAuth } from "./AuthContext";
 
 interface DataContextValue {
   categories: Category[];
-  categoryGroups: CategoryGroup[];
-  accounts: Account[];
+  sessions: Session[];
   groups: Group[];
-  transactions: Transaction[];
+  logEntries: LogEntry[];
   users: AppUser[];
   loaded: boolean;
   refreshAll: () => Promise<void>;
-  refreshTransactions: () => Promise<void>;
+  refreshLogEntries: () => Promise<void>;
+  refreshSessions: () => Promise<void>;
   refreshCategories: () => Promise<void>;
-  refreshCategoryGroups: () => Promise<void>;
-  refreshAccounts: () => Promise<void>;
   refreshGroups: () => Promise<void>;
   refreshUsers: () => Promise<void>;
 }
@@ -37,31 +33,28 @@ const DataContext = createContext<DataContextValue | null>(null);
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const { me } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [users, setUsers] = useState<AppUser[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   const refreshCategories = useCallback(async () => setCategories(await listCategories()), []);
-  const refreshCategoryGroups = useCallback(async () => setCategoryGroups(await listCategoryGroups()), []);
-  const refreshAccounts = useCallback(async () => setAccounts(await listAccounts()), []);
+  const refreshSessions = useCallback(async () => setSessions(await listSessions()), []);
   const refreshGroups = useCallback(async () => setGroups(await listGroups()), []);
-  const refreshTransactions = useCallback(async () => setTransactions(await listTransactions()), []);
+  const refreshLogEntries = useCallback(async () => setLogEntries(await listLogEntries()), []);
   const refreshUsers = useCallback(async () => setUsers(await getAllUsers()), []);
 
   const refreshAll = useCallback(async () => {
     await Promise.all([
       refreshCategories(),
-      refreshCategoryGroups(),
-      refreshAccounts(),
+      refreshSessions(),
       refreshGroups(),
-      refreshTransactions(),
+      refreshLogEntries(),
       refreshUsers(),
     ]);
     setLoaded(true);
-  }, [refreshCategories, refreshCategoryGroups, refreshAccounts, refreshGroups, refreshTransactions, refreshUsers]);
+  }, [refreshCategories, refreshSessions, refreshGroups, refreshLogEntries, refreshUsers]);
 
   useEffect(() => {
     if (me) refreshAll();
@@ -71,17 +64,15 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     <DataContext.Provider
       value={{
         categories,
-        categoryGroups,
-        accounts,
+        sessions,
         groups,
-        transactions,
+        logEntries,
         users,
         loaded,
         refreshAll,
-        refreshTransactions,
+        refreshLogEntries,
         refreshCategories,
-        refreshCategoryGroups,
-        refreshAccounts,
+        refreshSessions,
         refreshGroups,
         refreshUsers,
       }}

@@ -52,22 +52,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    match /categoryGroups/{groupId} {
-      allow read: if isSignedIn();
-      allow write: if isAdmin();
-    }
-
     match /categories/{categoryId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
 
-    match /accounts/{accountId} {
+    match /sessions/{sessionId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
 
-    match /transactions/{txId} {
+    match /logEntries/{entryId} {
       allow read: if isActive();
       allow create: if isActive() && request.resource.data.userId == request.auth.uid;
       allow delete: if isActive() && (resource.data.userId == request.auth.uid || isAdmin());
