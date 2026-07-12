@@ -14,6 +14,11 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),
 ];
-config.resolver.disableHierarchicalLookup = true;
+// IMPORTANT: keep hierarchical lookup enabled (the default). Disabling it
+// makes Metro only search the two directories above, which breaks
+// resolution of nested (non-hoisted) dependencies like
+// react-native/node_modules/@react-native/virtualized-lists — that's what
+// caused "Unable to resolve module @react-native/virtualized-lists" on
+// native platforms (Android/iOS), even though the web build worked fine.
 
 module.exports = config;
