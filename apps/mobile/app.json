@@ -17,6 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F1EEE3"
       },
       "package": "com.carnetentrainement.app"
