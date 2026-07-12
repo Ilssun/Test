@@ -86,6 +86,11 @@ export default function AuthScreen() {
           }}
         />
       </View>
+      <Text style={styles.debug}>
+        DEBUG apiKey: {process.env.EXPO_PUBLIC_FIREBASE_API_KEY ? `présente (${process.env.EXPO_PUBLIC_FIREBASE_API_KEY.length} car.)` : "ABSENTE"}
+        {"\n"}projectId: {process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "ABSENT"}
+        {"\n"}authDomain: {process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || "ABSENT"}
+      </Text>
     </ScrollView>
   );
 }
@@ -116,4 +121,5 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   pickerWrap: { borderWidth: 2, borderColor: colors.blue, borderRadius: 8, marginTop: 8, backgroundColor: colors.field },
+  debug: { fontFamily: fonts.mono, fontSize: 10, color: colors.muted, textAlign: "center", marginTop: 20 },
 });
