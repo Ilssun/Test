@@ -93,23 +93,29 @@ npm run mobile:android
 npm run mobile:ios
 ```
 
-## 5. Publier sur Android / iOS (via EAS Build)
+## 5. Distribuer l'app sans passer par un store
 
-Nécessite un compte Expo (gratuit) et, pour iOS, un compte Apple Developer
-(99 $/an) ; pour Android, un compte Google Play Console (25 $ une fois).
+Trois façons de rendre l'app disponible pour tes membres, sans Google Play
+ni App Store.
+
+### Android — fichier `.apk` à installer directement
+
+Nécessite un compte Expo (gratuit, sur expo.dev).
 
 ```bash
 npm install -g eas-cli
 cd apps/mobile
 eas login
-eas build:configure
-eas build --platform android
-eas build --platform ios
-eas submit --platform android
-eas submit --platform ios
+eas build --platform android --profile preview
 ```
 
-## 6. Construire l'app Windows (Electron)
+Le build tourne sur les serveurs Expo (quelques minutes) et te donne un
+lien de téléchargement direct du `.apk` à la fin. Partage ce lien (email,
+Drive, WhatsApp...) — chaque membre télécharge le fichier, autorise
+« Installer des applications inconnues » quand Android le demande, et
+installe. Pas de Play Store, pas de délai de validation.
+
+### Windows — installeur `.exe`
 
 ```bash
 npm run web:export                # génère apps/mobile/dist (export web Expo)
@@ -119,14 +125,49 @@ npm install
 npm run build                     # produit l'installeur .exe dans apps/desktop/release
 ```
 
+Partage le `.exe` généré directement. Windows SmartScreen affichera un
+avertissement (« Windows a protégé votre ordinateur ») car l'app n'est pas
+signée — l'utilisateur clique sur « Informations complémentaires » puis
+« Exécuter quand même ». Pour supprimer cet avertissement il faudrait un
+certificat de signature de code payant (optionnel).
+
 Remplace `apps/desktop/icon.ico` par une vraie icône avant de distribuer
 l'installeur (aucune icône par défaut n'est fournie).
 
+### iOS (et tout navigateur) — via Firebase Hosting
+
+Apple ne permet pas d'installer une app en dehors de l'App Store sans
+compte développeur payant (99 $/an, même pour TestFlight). L'alternative
+gratuite : héberger la version Web sur une URL publique — les utilisateurs
+iPhone l'ouvrent dans Safari et peuvent faire « Ajouter à l'écran
+d'accueil » pour une icône façon app. Mêmes comptes, mêmes données que sur
+Android/Windows puisque c'est le même projet Firebase.
+
+```bash
+npm run web:export                # génère apps/mobile/dist
+firebase deploy --only hosting
+```
+
+Ton app sera disponible sur `https://<ton-projet>.web.app`.
+
+### Publier sur les stores officiels (optionnel, plus tard)
+
+Si tu veux un jour une vraie présence sur Google Play / App Store :
+
+```bash
+eas build --platform android --profile production   # génère un .aab pour Play Store
+eas build --platform ios                             # nécessite un compte Apple Developer
+eas submit --platform android
+eas submit --platform ios
+```
+
+Nécessite un compte Google Play Console (25 $ une fois) et/ou Apple
+Developer (99 $/an), plus un délai de validation.
+
 ## Ce que ce dépôt ne fait PAS
 
-- Il ne construit pas de binaires signés `.apk` / `.ipa` / `.exe` prêts à
-  publier — cela nécessite tes propres comptes développeur (Apple, Google,
-  éventuellement un certificat de signature Windows) et s'exécute via les
-  commandes `eas build` / `electron-builder` ci-dessus.
+- Il ne construit pas de binaires prêts à distribuer (`.apk` / `.exe`) ni
+  ne déploie l'hébergement Web — ces builds tournent sur tes propres
+  comptes (Expo, Firebase) via les commandes ci-dessus.
 - Il ne fournit pas d'icônes ni de splash screen définitifs — remplace les
   fichiers dans `apps/mobile/assets/` et `apps/desktop/icon.ico`.
