@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Switch } from "react-native";
-import { login, signup, listGroups, AuthError, Group } from "@carnet/core";
+import { login, signup, listGroups, AuthError, Group, __DEBUG_FIREBASE_CONFIG__ } from "@carnet/core";
 import { Input, Button, Eyebrow } from "../components/ui";
 import { colors, fonts } from "../theme";
 import { useToast } from "../context/ToastContext";
@@ -87,9 +87,10 @@ export default function AuthScreen() {
         />
       </View>
       <Text style={styles.debug}>
-        DEBUG apiKey: {process.env.EXPO_PUBLIC_FIREBASE_API_KEY ? `présente (${process.env.EXPO_PUBLIC_FIREBASE_API_KEY.length} car.)` : "ABSENTE"}
-        {"\n"}projectId: {process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "ABSENT"}
-        {"\n"}authDomain: {process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || "ABSENT"}
+        DEBUG (dans apps/mobile) apiKey: {process.env.EXPO_PUBLIC_FIREBASE_API_KEY ? `présente (${process.env.EXPO_PUBLIC_FIREBASE_API_KEY.length} car.)` : "ABSENTE"}
+        {"\n"}DEBUG (dans packages/core) apiKey: {__DEBUG_FIREBASE_CONFIG__.apiKey ? `présente (${__DEBUG_FIREBASE_CONFIG__.apiKey.length} car.)` : "ABSENTE"}
+        {"\n"}core projectId: {__DEBUG_FIREBASE_CONFIG__.projectId || "ABSENT"}
+        {"\n"}core authDomain: {__DEBUG_FIREBASE_CONFIG__.authDomain || "ABSENT"}
       </Text>
     </ScrollView>
   );
