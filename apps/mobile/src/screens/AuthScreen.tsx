@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Switch } from "react-native";
-import { login, signup, listGroups, AuthError, Group, __DEBUG_FIREBASE_CONFIG__ } from "@carnet/core";
+import { login, signup, listGroups, AuthError, Group } from "@carnet/core";
 import { Input, Button, Eyebrow } from "../components/ui";
 import { colors, fonts } from "../theme";
 import { useToast } from "../context/ToastContext";
@@ -86,12 +86,6 @@ export default function AuthScreen() {
           }}
         />
       </View>
-      <Text style={styles.debug}>
-        DEBUG (dans apps/mobile) apiKey: {process.env.EXPO_PUBLIC_FIREBASE_API_KEY ? `présente (${process.env.EXPO_PUBLIC_FIREBASE_API_KEY.length} car.)` : "ABSENTE"}
-        {"\n"}DEBUG (dans packages/core) apiKey: {__DEBUG_FIREBASE_CONFIG__.apiKey ? `présente (${__DEBUG_FIREBASE_CONFIG__.apiKey.length} car.)` : "ABSENTE"}
-        {"\n"}core projectId: {__DEBUG_FIREBASE_CONFIG__.projectId || "ABSENT"}
-        {"\n"}core authDomain: {__DEBUG_FIREBASE_CONFIG__.authDomain || "ABSENT"}
-      </Text>
     </ScrollView>
   );
 }
@@ -122,5 +116,4 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   pickerWrap: { borderWidth: 2, borderColor: colors.blue, borderRadius: 8, marginTop: 8, backgroundColor: colors.field },
-  debug: { fontFamily: fonts.mono, fontSize: 10, color: colors.muted, textAlign: "center", marginTop: 20 },
 });

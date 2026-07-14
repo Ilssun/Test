@@ -20,11 +20,6 @@ const firebaseConfig: FirebaseOptions = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// TEMPORARY: exposed so the app can display what packages/core actually
-// saw for these env vars, to check whether Metro's env-var inlining reaches
-// files outside apps/mobile the same way it does files inside it.
-export const __DEBUG_FIREBASE_CONFIG__ = firebaseConfig;
-
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 let auth: Auth;
