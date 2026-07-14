@@ -7,9 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "carnetentrainement",
-    "splash": {
-      "backgroundColor": "#F1EEE3"
-    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
@@ -27,6 +24,17 @@
       "output": "single",
       "favicon": "./assets/icon.png"
     },
-    "plugins": ["expo-document-picker", "expo-image-picker"]
+    "plugins": [
+      "expo-document-picker",
+      "expo-image-picker",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F1EEE3",
+          "image": "./assets/icon.png",
+          "imageWidth": 200
+        }
+      ]
+    ]
   }
 }
