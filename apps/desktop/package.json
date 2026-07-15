@@ -12,6 +12,7 @@
     "electron-builder": "^25.0.5"
   },
   "build": {
+    "electronVersion": "32.3.3",
     "appId": "com.carnetentrainement.app",
     "productName": "Carnet d'entraînement",
     "files": ["main.js", "preload.js", "web/**/*"],
