@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Serpent de cahier</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap">
+<style>
+  /* Un seul thème assumé : une feuille de cahier Seyès, quel que soit l'hôte. */
+  :root {
+    color-scheme: light;
+    --paper: #fbfaf3;
+    --rule: #d3d8ef;
+    --rule-strong: #a3afdd;
+    --margin: #e0625b;
+    --ink: #1d3a9e;
+    --ink-soft: #52609e;
+    --red: #cf3328;
+    --pencil: #66635a;
+    --highlight: #fff27a;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image:
+      repeating-linear-gradient(to bottom, transparent 0 31px, rgba(163,175,221,.45) 31px 32px),
+      repeating-linear-gradient(to bottom, transparent 0 7px, rgba(211,216,239,.55) 7px 8px);
+    color: var(--ink);
+    font-family: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
+    font-size: 18px;
+    line-height: 1.45;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; bottom: 0; left: 44px;
+    width: 2px;
+    background: var(--margin);
+    opacity: .75;
+    pointer-events: none;
+  }
+  .sheet {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-block: 20px 40px;
+    padding-left: 72px;
+    padding-right: 24px;
+    display: grid;
+    gap: 20px;
+  }
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 4px 24px;
+  }
+  h1 {
+    font-family: "Caveat", "Segoe Script", cursive;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 6vw, 3.4rem);
+    line-height: 1;
+    margin: 0;
+    text-wrap: balance;
+    padding-bottom: 6px;
+    background: linear-gradient(var(--red), var(--red)) left bottom / 100% 3px no-repeat;
+  }
+  .date {
+    font-family: "Caveat", "Segoe Script", cursive;
+    font-size: 1.6rem;
+    color: var(--ink);
+  }
+  .intro { margin: 0; color: var(--pencil); max-width: 60ch; }
+
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 544px) minmax(220px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .board {
+    position: relative;
+    width: 100%;
+    max-width: 544px;
+    aspect-ratio: 1;
+    border: 2px solid var(--ink-soft);
+    border-radius: 3px 6px 4px 7px;
+    box-shadow: 3px 4px 0 rgba(29,58,158,.12);
+    touch-action: none;
+    background: var(--paper);
+  }
+  canvas { display: block; width: 100%; height: 100%; }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(251,250,243,.8);
+  }
+  .note {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    text-align: center;
+    max-width: 34ch;
+  }
+  .note h2 {
+    font-family: "Caveat", "Segoe Script", cursive;
+    font-size: 2.6rem;
+    line-height: 1;
+    margin: 0;
+  }
+  .note p { margin: 0; }
+  .grade {
+    font-family: "Caveat", "Segoe Script", cursive;
+    color: var(--red);
+    font-size: 3.4rem;
+    line-height: 1;
+    transform: rotate(-4deg);
+    border: 3px solid var(--red);
+    border-radius: 50% 46% 52% 48%;
+    padding: 6px 22px 2px;
+  }
+  .comment { color: var(--red); font-family: "Caveat", "Segoe Script", cursive; font-size: 1.7rem; line-height: 1.1; }
+  .hint { color: var(--pencil); font-size: .95rem; }
+
+  button {
+    font: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 7px 11px 6px 12px;
+    padding: 6px 18px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--highlight); }
+  button:focus-visible { outline: 3px dashed var(--red); outline-offset: 3px; }
+  button.primary { font-size: 1.2rem; }
+  button.boss-btn { border-color: var(--red); color: var(--red); }
+
+  aside { display: grid; gap: 22px; }
+  .scores {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 0;
+  }
+  .scores div { display: grid; }
+  .scores dt { color: var(--pencil); font-size: .9rem; letter-spacing: .04em; text-transform: uppercase; }
+  .scores dd {
+    margin: 0;
+    font-family: "Caveat", "Segoe Script", cursive;
+    font-size: 2.4rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  aside h3 {
+    font-family: "Caveat", "Segoe Script", cursive;
+    font-size: 1.7rem;
+    margin: 0 0 4px;
+    text-decoration: underline var(--red) 2px;
+    text-underline-offset: 4px;
+  }
+  aside ul { margin: 0; padding-left: 1.1em; }
+  aside li { margin: 2px 0; }
+  kbd {
+    font: inherit;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 4px;
+    padding: 0 5px;
+    background: var(--paper);
+  }
+  .legend { color: var(--red); }
+
+  .pad {
+    display: none;
+    grid-template-columns: repeat(3, 64px);
+    grid-template-rows: repeat(2, 56px);
+    gap: 8px;
+    justify-content: center;
+  }
+  .pad button { padding: 0; font-size: 1.6rem; }
+  .pad .up { grid-column: 2; }
+  .pad .left { grid-column: 1; grid-row: 2; }
+  .pad .down { grid-column: 2; grid-row: 2; }
+  .pad .right { grid-column: 3; grid-row: 2; }
+  @media (pointer: coarse) { .pad { display: grid; } }
+
+  /* Écran "le prof arrive" */
+  .boss {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    overflow-y: auto;
+    background-color: var(--paper);
+    background-image: inherit;
+  }
+  .boss .sheet { max-width: 720px; }
+  .boss h2 {
+    font-family: "Caveat", "Segoe Script", cursive;
+    font-size: 2.6rem;
+    margin: 0;
+    padding-bottom: 4px;
+    background: linear-gradient(var(--red), var(--red)) left bottom / 100% 3px no-repeat;
+    justify-self: start;
+  }
+  .boss h4 { font-family: "Caveat", "Segoe Script", cursive; font-size: 1.7rem; margin: 0; color: var(--red); }
+  .conj {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px 32px;
+  }
+  .conj ul { list-style: none; margin: 0; padding: 0; font-size: 1.15rem; }
+  .conj b { font-weight: normal; background: linear-gradient(transparent 55%, var(--highlight) 55%); }
+  .blank { color: var(--pencil); }
+  .back-hint { color: var(--rule-strong); font-size: .85rem; }
+
+  @media (max-width: 800px) {
+    main { grid-template-columns: minmax(0, 1fr); }
+    .board { margin: 0 auto; }
+  }
+  @media (max-width: 560px) {
+    body::before { left: 8px; }
+    .sheet { padding-left: 22px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet" id="game-sheet">
+  <header>
+    <h1>Serpent de cahier</h1>
+    <div class="date" id="date">Lundi 28 septembre</div>
+  </header>
+  <p class="intro">Un snake silencieux, dessiné au stylo bille sur ta feuille. Aucun son, pause instantanée, et une touche pour cacher le jeu.</p>
+
+  <main>
+    <div>
+      <div class="board" id="board-wrap">
+        <canvas id="board" aria-label="Plateau de jeu"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="note" id="note">
+            <h2>Prêt ?</h2>
+            <p>Mange les dessins au stylo rouge. Évite le bord de la feuille et ta propre queue.</p>
+            <button class="primary" id="start-btn" type="button">Commencer</button>
+            <p class="hint">Espace ou Entrée</p>
+          </div>
+        </div>
+      </div>
+      <div class="pad" id="pad" aria-label="Flèches tactiles">
+        <button type="button" class="up" data-dir="up" aria-label="Haut">↑</button>
+        <button type="button" class="left" data-dir="left" aria-label="Gauche">←</button>
+        <button type="button" class="down" data-dir="down" aria-label="Bas">↓</button>
+        <button type="button" class="right" data-dir="right" aria-label="Droite">→</button>
+      </div>
+    </div>
+
+    <aside>
+      <dl class="scores">
+        <div><dt>Score</dt><dd id="score">0</dd></div>
+        <div><dt>Record</dt><dd id="best">0</dd></div>
+        <div><dt>Niveau</dt><dd id="level">1</dd></div>
+      </dl>
+
+      <section>
+        <h3>Commandes</h3>
+        <ul>
+          <li><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> ou <kbd>Z</kbd> <kbd>Q</kbd> <kbd>S</kbd> <kbd>D</kbd> : diriger</li>
+          <li><kbd>Espace</kbd> : pause</li>
+          <li><kbd>Échap</kbd> : le prof arrive</li>
+          <li>Sur téléphone : glisse le doigt sur la feuille</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Barème</h3>
+        <ul class="legend">
+          <li>Étoile, cœur, pomme : 1 point</li>
+          <li>Gomme : 5 points, mais elle disparaît vite</li>
+          <li>Chaque niveau accélère le trait</li>
+        </ul>
+      </section>
+
+      <button class="boss-btn" id="boss-btn" type="button">Le prof arrive</button>
+    </aside>
+  </main>
+</div>
+
+<div class="boss" id="boss" hidden>
+  <div class="sheet">
+    <h2>Leçon 3 : le passé simple</h2>
+    <p>Le passé simple exprime une action achevée dans le passé, souvent dans un récit. On l'emploie surtout à l'écrit.</p>
+    <div class="conj">
+      <div>
+        <h4>1er groupe : chanter</h4>
+        <ul>
+          <li>je chant<b>ai</b></li>
+          <li>tu chant<b>as</b></li>
+          <li>il / elle chant<b>a</b></li>
+          <li>nous chant<b>âmes</b></li>
+          <li>vous chant<b>âtes</b></li>
+          <li>ils / elles chant<b>èrent</b></li>
+        </ul>
+      </div>
+      <div>
+        <h4>2e groupe : finir</h4>
+        <ul>
+          <li>je fin<b>is</b></li>
+          <li>tu fin<b>is</b></li>
+          <li>il / elle fin<b>it</b></li>
+          <li>nous fin<b>îmes</b></li>
+          <li>vous fin<b>îtes</b></li>
+          <li>ils / elles fin<b>irent</b></li>
+        </ul>
+      </div>
+    </div>
+    <p><b>Exercice 4 p. 52</b> : conjugue « prendre » au passé simple.</p>
+    <p class="blank">je ................ &nbsp; tu ................ &nbsp; il ................</p>
+    <p class="back-hint">Échap</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const COLS = 16, ROWS = 16;
+  const INK = '#1d3a9e', RED = '#cf3328', RULE = '#d3d8ef', RULE_STRONG = '#a3afdd', PAPER = '#fbfaf3';
+  const BEST_KEY = 'serpent-de-cahier-record';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const canvas = document.getElementById('board');
+  const ctx = canvas.getContext('2d');
+  const wrap = document.getElementById('board-wrap');
+  const overlay = document.getElementById('overlay');
+  const note = document.getElementById('note');
+  const bossEl = document.getElementById('boss');
+  const $score = document.getElementById('score');
+  const $best = document.getElementById('best');
+  const $level = document.getElementById('level');
+
+  // Date du jour, écrite comme en haut d'une copie.
+  const d = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  document.getElementById('date').textContent = d.charAt(0).toUpperCase() + d.slice(1);
+
+  let cell = 20;
+  let snake, dir, queue, food, bonus, score, eaten, stepMs, acc = 0, state = 'ready';
+  let best = 0;
+  try { best = parseInt(localStorage.getItem(BEST_KEY), 10) || 0; } catch (e) {}
+
+  const DIRS = {
+    up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
+    left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
+  };
+  const KINDS = ['etoile', 'coeur', 'pomme'];
+
+  function reset() {
+    snake = [{ x: 6, y: 8 }, { x: 5, y: 8 }, { x: 4, y: 8 }, { x: 3, y: 8 }];
+    dir = DIRS.right;
+    queue = [];
+    score = 0;
+    eaten = 0;
+    stepMs = 150;
+    acc = 0;
+    bonus = null;
+    food = spawn();
+    updateHud();
+  }
+
+  function occupied(x, y) {
+    return snake.some(s => s.x === x && s.y === y) ||
+      (food && food.x === x && food.y === y) ||
+      (bonus && bonus.x === x && bonus.y === y);
+  }
+
+  function spawn() {
+    const free = [];
+    for (let y = 0; y < ROWS; y++)
+      for (let x = 0; x < COLS; x++)
+        if (!occupied(x, y)) free.push({ x, y });
+    if (!free.length) return null;
+    const c = free[Math.floor(Math.random() * free.length)];
+    c.kind = KINDS[Math.floor(Math.random() * KINDS.length)];
+    return c;
+  }
+
+  function level() { return Math.floor(eaten / 5) + 1; }
+
+  function updateHud() {
+    $score.textContent = score;
+    $best.textContent = best;
+    $level.textContent = level();
+  }
+
+  function turn(name) {
+    const d = DIRS[name];
+    if (!d) return;
+    if (state === 'ready' || state === 'over') { start(); }
+    if (state !== 'play') return;
+    const lastDir = queue.length ? queue[queue.length - 1] : dir;
+    if (d === lastDir || (d.x === -lastDir.x && d.y === -lastDir.y)) return;
+    if (queue.length < 3) queue.push(d);
+  }
+
+  function step() {
+    if (queue.length) dir = queue.shift();
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    if (head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= ROWS)
+      return gameOver('Tu es sorti de la feuille.');
+    const eats = food && head.x === food.x && head.y === food.y;
+    const body = eats ? snake : snake.slice(0, -1);
+    if (body.some(s => s.x === head.x && s.y === head.y))
+      return gameOver('Tu t’es mordu la queue.');
+
+    snake.unshift(head);
+    if (eats) {
+      score += 1;
+      eaten += 1;
+      stepMs = Math.max(70, 150 - eaten * 3);
+      food = spawn();
+      if (!bonus && eaten % 5 === 0) {
+        bonus = spawn();
+        if (bonus) bonus.ttl = 6000;
+      }
+      if (!food) return gameOver('Feuille remplie. Rien à redire.');
+    } else {
+      snake.pop();
+    }
+    if (bonus && head.x === bonus.x && head.y === bonus.y) {
+      score += 5;
+      bonus = null;
+    }
+    updateHud();
+  }
+
+  // ---------- Écrans ----------
+  function showNote(html) {
+    note.innerHTML = html;
+    overlay.hidden = false;
+    const btn = note.querySelector('button');
+    if (btn) btn.addEventListener('click', btn.dataset.action === 'resume' ? resume : start);
+  }
+
+  function start() {
+    reset();
+    state = 'play';
+    overlay.hidden = true;
+  }
+
+  function pause() {
+    if (state !== 'play') return;
+    state = 'pause';
+    showNote('<h2>Pause</h2><p>Le serpent attend sagement.</p>' +
+      '<button class="primary" type="button" data-action="resume">Reprendre</button>' +
+      '<p class="hint">Espace</p>');
+  }
+
+  function resume() {
+    if (state !== 'pause') return;
+    state = 'play';
+    acc = 0;
+    overlay.hidden = true;
+  }
+
+  const COMMENTS = [
+    [0, 'Hors sujet. Tu as vu le bord ?'],
+    [5, 'Insuffisant, mais ça démarre.'],
+    [10, 'Passable. Des efforts visibles.'],
+    [14, 'Bien ! Attention à ta queue.'],
+    [17, 'Très bien, continue ainsi.'],
+    [20, 'Excellent. Félicitations du jury.'],
+  ];
+
+  function gameOver(reason) {
+    state = 'over';
+    const newBest = score > best;
+    if (newBest) {
+      best = score;
+      try { localStorage.setItem(BEST_KEY, String(best)); } catch (e) {}
+    }
+    updateHud();
+    const grade = Math.min(20, Math.round(score / 2));
+    let comment = COMMENTS[0][1];
+    for (const [min, text] of COMMENTS) if (grade >= min) comment = text;
+    showNote(
+      `<div class="grade">${grade}/20</div>` +
+      `<p class="comment">${comment}</p>` +
+      `<p>${reason} Score : ${score}${newBest ? ', nouveau record !' : '.'}</p>` +
+      '<button class="primary" type="button">Rejouer</button>' +
+      '<p class="hint">Espace ou Entrée</p>'
+    );
+  }
+
+  function toggleBoss() {
+    if (bossEl.hidden) {
+      pause();
+      bossEl.hidden = false;
+      document.title = 'Leçon 3 : le passé simple';
+    } else {
+      bossEl.hidden = true;
+      document.title = 'Serpent de cahier';
+    }
+  }
+
+  // ---------- Dessin ----------
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(r.width * dpr));
+    canvas.height = Math.max(1, Math.round(r.height * dpr));
+    cell = canvas.width / COLS;
+    draw(performance.now());
+  }
+
+  function jitter(x, y, salt) {
+    const h = Math.sin(x * 127.1 + y * 311.7 + salt * 74.7) * 43758.5453;
+    return (h - Math.floor(h) - 0.5) * cell * 0.14;
+  }
+
+  function drawPaper() {
+    ctx.fillStyle = PAPER;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const lw = Math.max(1, cell / 40);
+    // Seyès : trois lignes fines entre deux lignes fortes.
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = RULE;
+    ctx.beginPath();
+    for (let r = 0; r < ROWS; r++)
+      for (let k = 1; k < 4; k++) {
+        const y = Math.round((r + k / 4) * cell) + 0.5;
+        ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+      }
+    ctx.stroke();
+    ctx.strokeStyle = RULE_STRONG;
+    ctx.beginPath();
+    for (let i = 1; i < ROWS; i++) {
+      const y = Math.round(i * cell) + 0.5;
+      ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+    }
+    for (let i = 1; i < COLS; i++) {
+      const x = Math.round(i * cell) + 0.5;
+      ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+    }
+    ctx.stroke();
+  }
+
+  function drawDoodle(item, t) {
+    const cx = (item.x + 0.5) * cell, cy = (item.y + 0.5) * cell;
+    const s = reduceMotion ? 1 : 1 + Math.sin(t / 260 + item.x) * 0.06;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    ctx.strokeStyle = RED;
+    ctx.fillStyle = 'rgba(207,51,40,.14)';
+    ctx.lineWidth = Math.max(1.5, cell * 0.07);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    const r = cell * 0.34;
+    ctx.beginPath();
+    if (item.kind === 'etoile') {
+      for (let i = 0; i < 10; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 5;
+        const rr = i % 2 ? r * 0.45 : r;
+        ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+      }
+      ctx.closePath();
+    } else if (item.kind === 'coeur') {
+      ctx.moveTo(0, r * 0.9);
+      ctx.bezierCurveTo(-r * 1.3, -r * 0.1, -r * 0.6, -r * 1.1, 0, -r * 0.35);
+      ctx.bezierCurveTo(r * 0.6, -r * 1.1, r * 1.3, -r * 0.1, 0, r * 0.9);
+    } else {
+      ctx.arc(0, r * 0.12, r * 0.78, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, -r * 0.6);
+      ctx.quadraticCurveTo(r * 0.1, -r * 0.95, r * 0.05, -r * 1.05);
+      ctx.moveTo(r * 0.05, -r * 0.8);
+      ctx.quadraticCurveTo(r * 0.55, -r * 1.1, r * 0.6, -r * 0.7);
+      ctx.quadraticCurveTo(r * 0.3, -r * 0.6, r * 0.05, -r * 0.8);
+    }
+    if (item.kind !== 'pomme') ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawEraser(item, t) {
+    if (item.ttl < 2000 && !reduceMotion && Math.floor(t / 150) % 2) return;
+    const cx = (item.x + 0.5) * cell, cy = (item.y + 0.5) * cell;
+    const w = cell * 0.8, h = cell * 0.46;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-0.35);
+    ctx.lineWidth = Math.max(1.5, cell * 0.06);
+    ctx.strokeStyle = INK;
+    ctx.fillStyle = '#f4b8c1';
+    ctx.fillRect(-w / 2, -h / 2, w * 0.55, h);
+    ctx.fillStyle = '#9fb4ec';
+    ctx.fillRect(-w / 2 + w * 0.55, -h / 2, w * 0.45, h);
+    ctx.strokeRect(-w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+
+  function drawSnake() {
+    const pts = snake.map((s, i) => ({
+      x: (s.x + 0.5) * cell + (i ? jitter(s.x, s.y, 1) : 0),
+      y: (s.y + 0.5) * cell + (i ? jitter(s.x, s.y, 2) : 0),
+    }));
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const path = () => {
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+    };
+    // Bavure d'encre, puis trait principal.
+    ctx.strokeStyle = 'rgba(29,58,158,.18)';
+    ctx.lineWidth = cell * 0.66;
+    path(); ctx.stroke();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = cell * 0.5;
+    path(); ctx.stroke();
+
+    // Tête et yeux.
+    const h = pts[0];
+    ctx.fillStyle = INK;
+    ctx.beginPath();
+    ctx.arc(h.x, h.y, cell * 0.36, 0, Math.PI * 2);
+    ctx.fill();
+    const px = -dir.y, py = dir.x;
+    for (const side of [-1, 1]) {
+      const ex = h.x + dir.x * cell * 0.1 + px * side * cell * 0.16;
+      const ey = h.y + dir.y * cell * 0.1 + py * side * cell * 0.16;
+      ctx.fillStyle = PAPER;
+      ctx.beginPath(); ctx.arc(ex, ey, cell * 0.1, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.arc(ex + dir.x * cell * 0.04, ey + dir.y * cell * 0.04, cell * 0.05, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function draw(t) {
+    drawPaper();
+    if (food) drawDoodle(food, t);
+    if (bonus) drawEraser(bonus, t);
+    drawSnake();
+  }
+
+  // ---------- Boucle ----------
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min(100, t - last);
+    last = t;
+    if (state === 'play') {
+      acc += dt;
+      while (acc >= stepMs && state === 'play') {
+        acc -= stepMs;
+        step();
+      }
+      if (bonus && state === 'play') {
+        bonus.ttl -= dt;
+        if (bonus.ttl <= 0) bonus = null;
+      }
+    }
+    draw(t);
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- Entrées ----------
+  const KEYMAP = {
+    ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+    z: 'up', w: 'up', s: 'down', q: 'left', a: 'left', d: 'right',
+  };
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); toggleBoss(); return; }
+    if (!bossEl.hidden) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (KEYMAP[k]) { e.preventDefault(); turn(KEYMAP[k]); return; }
+    if (e.key === ' ' || e.key === 'Enter' || k === 'p') {
+      // Laisse Entrée activer normalement un bouton qui a le focus.
+      if (e.key === 'Enter' && document.activeElement && document.activeElement.tagName === 'BUTTON') return;
+      e.preventDefault();
+      if (state === 'play') pause();
+      else if (state === 'pause') resume();
+      else start();
+    }
+  });
+
+  document.getElementById('start-btn').addEventListener('click', start);
+  document.getElementById('boss-btn').addEventListener('click', toggleBoss);
+  bossEl.addEventListener('click', toggleBoss);
+  document.querySelectorAll('.pad button').forEach(b =>
+    b.addEventListener('pointerdown', e => { e.preventDefault(); turn(b.dataset.dir); }));
+
+  let touch = null;
+  wrap.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    touch = { x: t.clientX, y: t.clientY };
+  }, { passive: true });
+  wrap.addEventListener('touchmove', e => {
+    if (!touch || state !== 'play') return;
+    const t = e.touches[0];
+    const dx = t.clientX - touch.x, dy = t.clientY - touch.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    turn(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+    touch = { x: t.clientX, y: t.clientY };
+  }, { passive: true });
+  wrap.addEventListener('touchend', () => { touch = null; });
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+  reset();
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
