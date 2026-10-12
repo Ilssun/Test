@@ -53,19 +53,16 @@ export default function LogScreen() {
     if (!s) return notify("Choisis une séance", "err");
     setSaving(true);
     try {
-      await addLogEntry(
-        {
-          date,
-          sessionId: s.id,
-          sessionName: s.name,
-          rating: rating || undefined,
-          comment,
-          userId: me.id,
-          userName: me.username,
-          groupId: me.groupId || "",
-        },
-        logEntries
-      );
+      await addLogEntry({
+        date,
+        sessionId: s.id,
+        sessionName: s.name,
+        rating: rating || undefined,
+        comment,
+        userId: me.id,
+        userName: me.username,
+        groupId: me.groupId || "",
+      });
       await refreshLogEntries();
       setSessionId("");
       setRating(0);

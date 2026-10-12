@@ -21,11 +21,7 @@ export interface NewLogEntryInput {
   groupId: string;
 }
 
-export const addLogEntry = async (input: NewLogEntryInput, existing: LogEntry[]): Promise<LogEntry> => {
-  const already = existing.some(
-    (e) => e.userId === input.userId && e.date === input.date && e.sessionId === input.sessionId
-  );
-  if (already) throw new Error("Déjà validée pour ce jour");
+export const addLogEntry = async (input: NewLogEntryInput): Promise<LogEntry> => {
   const entry: LogEntry = {
     id: uid(),
     date: input.date,
