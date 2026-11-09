@@ -1,15 +1,17 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { fmtDate, visibleLogEntries, leaderboard, favoriteSession, groupByDate } from "@carnet/core";
+import { fmtDate, visibleLogEntries, leaderboard, favoriteSession, groupByDate, deleteLogEntry, LogEntry } from "@carnet/core";
 import { Eyebrow, Avatar, Chip, Stars, DateStamp, Tally } from "../components/ui";
 import { colors, fonts } from "../theme";
 import { useAuth } from "../context/AuthContext";
 import { useData } from "../context/DataContext";
+import { useToast } from "../context/ToastContext";
 
 export default function HistoryScreen() {
   const { me } = useAuth();
-  const { logEntries, users, groups } = useData();
+  const { logEntries, users, groups, refreshLogEntries } = useData();
+  const notify = useToast();
   const [groupFilter, setGroupFilter] = useState<string>("all");
   const [userFilter, setUserFilter] = useState<string>("all");
   const [sessionFilter, setSessionFilter] = useState<string>("all");
@@ -41,6 +43,21 @@ export default function HistoryScreen() {
   }, [visible]);
 
   const sessionNames = useMemo(() => [...new Set(visible.map((e) => e.sessionName))].sort(), [visible]);
+
+  const handleDelete = (entry: LogEntry) => {
+    Alert.alert("Retirer cette validation ?", `${entry.userName} — ${entry.sessionName}`, [
+      { text: "Annuler", style: "cancel" },
+      {
+        text: "Retirer",
+        style: "destructive",
+        onPress: async () => {
+          await deleteLogEntry(entry);
+          await refreshLogEntries();
+          notify("Séance retirée du carnet");
+        },
+      },
+    ]);
+  };
 
   if (!me) return null;
 
@@ -126,6 +143,11 @@ export default function HistoryScreen() {
                       </View>
                       {e.comment ? <Text style={styles.entryNote}>« {e.comment} »</Text> : null}
                     </View>
+                    {isAdmin && (
+                      <TouchableOpacity onPress={() => handleDelete(e)} style={styles.deleteBtn}>
+                        <Text style={{ color: colors.muted }}>✕</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 ))}
               </View>
@@ -159,4 +181,5 @@ const styles = StyleSheet.create({
   entryRow: { flexDirection: "row", alignItems: "flex-start", gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.line },
   entryUser: { fontFamily: fonts.bodyBold, fontSize: 14.5, color: colors.text },
   entryNote: { fontFamily: fonts.body, fontSize: 13, color: colors.muted, fontStyle: "italic", marginTop: 3 },
+  deleteBtn: { padding: 4 },
 });
